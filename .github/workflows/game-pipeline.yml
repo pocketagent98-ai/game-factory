@@ -1,0 +1,102 @@
+name: Game Factory Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      game_bible_path:
+        description: 'Path to game bible YAML file (e.g. test-games/temple-run/game-bible/game_spec.yaml)'
+        required: true
+        default: 'test-games/temple-run/game-bible/game_spec.yaml'
+      resume_from_checkpoint:
+        description: 'Checkpoint number to resume from (empty = start fresh)'
+        required: false
+        default: ''
+
+# Anti-infinite-loop: hard timeout
+timeout-minutes: 320
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 320
+
+    steps:
+      - name: Checkout factory code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install pyyaml requests huggingface_hub
+          sudo apt-get update && sudo apt-get install -y wget unzip
+
+      - name: Download Godot Headless (cached)
+        uses: actions/cache@v4
+        id: godot-cache
+        with:
+          path: godot
+          key: godot-4.7.2-linux
+
+      - name: Download Godot if not cached
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          wget -q https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+          unzip -q Godot_v4.7.2-stable_linux.x86_64.zip
+          mkdir -p godot
+          mv Godot_v4.7.2-stable_linux.x86_64 godot/
+          chmod +x godot/Godot_v4.7.2-stable_linux.x86_64
+
+      - name: Godot Version Detection
+        run: |
+          python game-factory/godot_version_detector.py --bible ${{ inputs.game_bible_path }}
+
+      - name: Restore checkpoint (if resume)
+        if: inputs.resume_from_checkpoint != ''
+        env:
+          OXEN_API_KEY: ${{ secrets.OXEN_API_KEY }}
+        run: |
+          python game-factory/checkpoint_manager.py restore \
+            --checkpoint ${{ inputs.resume_from_checkpoint }} \
+            --bible ${{ inputs.game_bible_path }}
+
+      - name: Run Game Factory Pipeline
+        env:
+          ZAI_API_KEY: ${{ secrets.ZAI_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          NARAROUTER_API_KEY: ${{ secrets.NARAROUTER_API_KEY }}
+          TOKENROUTER_API_KEY: ${{ secrets.TOKENROUTER_API_KEY }}
+          HF_API_KEY: ${{ secrets.HF_API_KEY }}
+          OXEN_API_KEY: ${{ secrets.OXEN_API_KEY }}
+          MODAL_API_KEY: ${{ secrets.MODAL_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python game-factory/orchestrator.py \
+            --bible ${{ inputs.game_bible_path }} \
+            --checkpoint-interval 300 \
+            --auto-upload-threshold 500 \
+            --max-runtime 18000 \
+            --max-test-cycles 40 \
+            --max-fix-attempts 3 \
+            --godot-path godot/Godot_v4.7.2-stable_linux.x86_64
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: game-build-output
+          path: |
+            output/
+            checkpoints/
+            test-reports/
+            store-listing/
+          retention-days: 30
+          compression-level: 6

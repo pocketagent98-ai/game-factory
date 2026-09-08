@@ -1,0 +1,53 @@
+# Game Bible Template — Game Factory
+# Fill in the fields below and trigger the pipeline.
+
+# === REQUIRED FIELDS ===
+project_id: "X001"           # Unique project ID (auto-assigned if empty)
+title: "My Game"             # Game title
+genre: "action"              # Game genre (action, puzzle, racing, etc.)
+description: "A short description of the game."
+platforms:                   # Target platforms
+  - "android"
+  - "windows"
+
+# === OPTIONAL FIELDS ===
+version: "1.0"
+update_mode: false           # Set to true for updates
+
+design:
+  perspective: "third-person"
+  art_style: "low-poly"
+  target_fps: 60
+  max_players: 1
+
+characters:
+  - name: "Player"
+    type: "player"
+    abilities: ["run", "jump", "attack"]
+
+levels:
+  - name: "Level 1"
+    type: "tutorial"
+
+audio:
+  music: true
+  sfx: true
+  voice: false
+
+languages:
+  - "en"
+  - "hi"
+  - "es"
+  - "fr"
+  - "de"
+  - "ar"
+  - "zh"
+  - "ja"
+
+# === UPDATE MODE ONLY ===
+# When update_mode: true, fill these:
+# update_notice:
+#   - "Add 5 new levels with winter theme"
+#   - "Fix audio bug in level 7"
+# do_not_touch:
+#   - "Existing levels 1-20 must not be modified"

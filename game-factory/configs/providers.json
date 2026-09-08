@@ -1,0 +1,106 @@
+{
+  "providers": {
+    "zai": {
+      "base_url": "https://api.z.ai/api/paas/v4",
+      "key_env": "ZAI_API_KEY",
+      "models": ["glm-4.7-flash", "glm-4.5-flash", "glm-4.6v-flash"],
+      "rate_limits": {"rpm": 60, "rpd": 1000},
+      "free_forever": true,
+      "reasoning_support": true,
+      "best_for": ["coding", "deep_analysis", "vision"],
+      "notes": "Best free coding model (59.2% SWE-bench). 200K context."
+    },
+    "nvidia": {
+      "base_url": "https://integrate.api.nvidia.com/v1",
+      "key_env": "NVIDIA_API_KEY",
+      "models": ["nemotron-3-ultra", "nemotron-3-super", "deepseek-v4-pro", "deepseek-v4-flash", "kimi-k3", "glm-5.2"],
+      "rate_limits": {"rpm": 40, "rpd": 500},
+      "free_forever": true,
+      "reasoning_support": true,
+      "best_for": ["deep_reasoning", "long_context"],
+      "notes": "100+ models. Nemotron 3 Ultra has 1M context."
+    },
+    "google": {
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "key_env": "GOOGLE_API_KEY",
+      "models": ["gemini-3.1-flash-lite", "gemini-3-flash", "gemma-4-31b", "gemma-4-26b"],
+      "rate_limits": {"rpm": 15, "rpd": 1500},
+      "free_forever": true,
+      "reasoning_support": true,
+      "best_for": ["translation", "multilingual", "creative"],
+      "notes": "1M context on Flash. Do NOT enable billing (kills free tier)."
+    },
+    "openrouter": {
+      "base_url": "https://openrouter.ai/api/v1",
+      "key_env": "OPENROUTER_API_KEY",
+      "models": ["auto:free", "nemotron-3-ultra:free", "minimax-m3:free", "laguna-s-2.1:free", "gpt-oss-120b:free", "gpt-oss-20b:free", "gemma-4-31b:free", "gemma-4-26b:free", "glm-5.2:free", "inkling:free"],
+      "rate_limits": {"rpm": 20, "rpd": 1000},
+      "free_forever": true,
+      "reasoning_support": true,
+      "best_for": ["fallback", "auto_routing"],
+      "notes": "20+ free models. Auto-router selects best available."
+    },
+    "nararouter": {
+      "base_url": "https://router.bynara.id/v1",
+      "key_env": "NARAROUTER_API_KEY",
+      "models": ["deepseek-v4-flash-free", "glm-5.3-flash-free", "minimax-m3-free"],
+      "rate_limits": {"rpm": 10, "rpd": 500, "tokens_per_day": 5000000},
+      "free_forever": true,
+      "reasoning_support": true,
+      "best_for": ["additional_coding", "reasoning"],
+      "notes": "5M tokens/day. Per-class quota."
+    },
+    "tokenrouter": {
+      "base_url": "https://api.tokenrouter.io/v1",
+      "key_env": "TOKENROUTER_API_KEY",
+      "models": ["kimi-k2.7-code", "deepseek-v4-pro", "deepseek-v4-flash"],
+      "rate_limits": {"rpm": 30, "rpd": 1000},
+      "free_forever": false,
+      "free_offer": "GLM-5.3 currently free (limited time)",
+      "reasoning_support": true,
+      "best_for": ["specialized_coding", "budget_control"],
+      "notes": "1000 requests/month free. BYOK."
+    },
+    "omniroute": {
+      "base_url": "http://localhost:20128/v1",
+      "key_env": "OMNIROUTE_API_KEY",
+      "models": ["auto"],
+      "rate_limits": {"rpm": "dynamic", "rpd": "dynamic"},
+      "free_forever": true,
+      "reasoning_support": "depends_on_model",
+      "best_for": ["universal_fallback", "token_compression"],
+      "notes": "Runs locally. 90+ free providers. Auto-fallback. 15-95% token compression."
+    }
+  },
+  "task_routing": {
+    "deep_analysis": ["zai/glm-4.7-flash", "nvidia/nemotron-3-ultra", "google/gemini-3-flash"],
+    "code_generation": ["zai/glm-4.7-flash", "openrouter/laguna-s-2.1:free", "openrouter/gpt-oss-120b:free"],
+    "translation": ["google/gemini-3.1-flash-lite", "google/gemma-4-31b", "zai/glm-4.5-flash"],
+    "fallback": ["omniroute/auto"]
+  },
+  "gpu_tools": {
+    "blender": {
+      "platform": "modal.com",
+      "use": "Characters and detailed 3D models only",
+      "auto_kill_seconds": 5,
+      "hard_timeout_minutes": 10
+    },
+    "terraforge3d": {
+      "platform": "modal.com",
+      "use": "Open-world terrain and map generation",
+      "auto_kill_seconds": 5,
+      "hard_timeout_minutes": 10,
+      "export_formats": ["GLTF", "GLB", "OBJ", "heightmap"]
+    },
+    "terrain3d": {
+      "platform": "godot_plugin",
+      "use": "In-Godot terrain system (runtime)",
+      "note": "No GPU cost - runs in Godot engine"
+    },
+    "clipmap3d": {
+      "platform": "godot_plugin",
+      "use": "Infinite procedural terrain with GPU compute shaders",
+      "note": "Runs on player GPU at runtime, no build-time cost"
+    }
+  }
+}

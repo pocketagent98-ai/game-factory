@@ -1,0 +1,98 @@
+# Temple Run Style Game — Test Game for Game Factory
+# This is a simple endless runner game to validate the full pipeline.
+
+project_id: "TR001"
+title: "Endless Dash"
+genre: "endless_runner"
+description: >
+  A 3D endless runner game inspired by Temple Run.
+  The player runs forward automatically through a procedurally generated path,
+  swiping left/right to change lanes, swiping up to jump, swiping down to slide.
+  Collect coins, avoid obstacles, survive as long as possible.
+  Speed increases over time. High score system. Simple, polished, fun.
+
+platforms:
+  - "android"
+  - "windows"
+
+version: "1.0"
+update_mode: false
+
+design:
+  perspective: "third-person"
+  art_style: "low-poly"
+  target_fps: 60
+  max_players: 1
+  
+  mechanics:
+    - "Player runs forward automatically"
+    - "3 lanes: left, center, right"
+    - "Swipe left/right to change lanes"
+    - "Swipe up to jump over obstacles"
+    - "Swipe down to slide under barriers"
+    - "Speed increases gradually over time"
+    - "Coins to collect for score"
+    - "Obstacles: rocks, logs, barriers, gaps"
+    - "Power-ups: magnet (attract coins), shield (1 hit protection), speed boost"
+    - "Game over on hitting obstacle"
+    - "High score saved locally"
+
+characters:
+  - name: "Runner"
+    type: "player"
+    abilities: ["run", "jump", "slide", "change_lane"]
+    model: "low-poly humanoid (procedural or simple Blender model)"
+
+track:
+  type: "procedural"
+  length: "infinite"
+  lanes: 3
+  segments:
+    - "straight"
+    - "turn_left"
+    - "turn_right"
+  obstacles:
+    - "rock (jump over)"
+    - "log (jump over)"
+    - "barrier (slide under)"
+    - "gap (jump across)"
+  collectibles:
+    - "coin (score)"
+    - "magnet (power-up)"
+    - "shield (power-up)"
+    - "speed_boost (power-up)"
+
+audio:
+  music: true
+  sfx: true
+  voice: false
+
+languages:
+  - "en"
+  - "hi"
+  - "es"
+  - "fr"
+  - "de"
+  - "ar"
+  - "zh"
+  - "ja"
+  - "ko"
+  - "pt"
+  - "ru"
+  - "tr"
+  - "it"
+  - "id"
+  - "vi"
+  - "th"
+
+store_listing:
+  category: "Game"
+  content_rating: "Everyone"
+  keywords: ["endless", "runner", "temple", "dash", "3d", "coins", "obstacle"]
+
+technical:
+  engine: "godot"
+  physics: "jolt"
+  renderer: "mobile"
+  min_android_api: 24
+  target_android_api: 36
